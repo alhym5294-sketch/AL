@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Secrets / local config
+.env
+.env.local
+*.pem
+*.key
+
+# Node
+node_modules/
+
+# Databases & media artifacts
+*.sqlite3
+*.db
+media/uploads/
+
+# Backups & archives
+_backups/
+backups/
+*.zip
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
