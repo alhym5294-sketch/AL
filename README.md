@@ -2,6 +2,78 @@
 
 نظام متطور لتسجيل حضور الطلاب باستخدام تقنية التعرف على الوجوه، مع لوحات تحكم شاملة للأدمن والمدرسين والطلاب.
 
+## 📁 هيكل المشروع
+
+```
+MUQ/
+├── backend/              # Django REST Framework Backend
+│   ├── attendance/       # Attendance & Schedule models
+│   ├── departments/      # Department, Stage, Branch models
+│   ├── users/           # User & FaceProfile models
+│   ├── muq_system/      # Django project settings
+│   ├── manage.py        # Django management script
+│   ├── requirements.txt # Python dependencies
+│   ├── Procfile         # Railway deployment config
+│   ├── railway.json     # Railway project config
+│   ├── .env.example     # Environment variables template
+│   ├── DEPLOYMENT.md    # Deployment guide
+│   └── README.md        # Backend documentation
+│
+├── frontend/            # Vanilla JavaScript Frontend
+│   ├── HTML/           # HTML pages
+│   ├── Js/             # JavaScript modules
+│   ├── css/            # Stylesheets
+│   ├── index.html      # Entry point
+│   └── README.md       # Frontend documentation
+│
+├── _backups/           # Archived Flask & Node.js backups
+│   ├── flask/          # Old Flask backend
+│   └── nodejs/         # Old Node.js backend
+│
+├── AUDIT_PHASE1.md     # Initial audit report
+└── README.md           # This file
+```
+
+## 🚀 البدء السريع
+
+### Backend (Django)
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+python manage.py migrate
+python manage.py create_superuser
+python manage.py runserver
+```
+
+Backend سيكون متاح على `http://localhost:8000/api/`
+
+### Frontend
+
+```bash
+cd frontend
+# Option 1: Open index.html directly in browser
+# Option 2: Use a local server
+python -m http.server 8010
+```
+
+Frontend سيكون متاح على `http://localhost:8010`
+
+## 🌐 النشر
+
+### Backend على Railway
+
+راجع [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md) للتعليمات التفصيلية.
+
+### Frontend على Netlify/Vercel
+
+1. Connect your Git repository
+2. Set publish directory to `frontend`
+3. Deploy
+
 ## المميزات
 
 ### للأدمن
@@ -12,6 +84,36 @@
 - تسجيل بيانات الوجه للطلاب والمدرسين والموظفين
 - إنشاء الجداول الدراسية حسب المادة والمرحلة والشعبة
 - عرض الإحصائيات والتقارير
+
+## كيفية الاستخدام
+
+### 1. إعداد المشرف الأعلى (مرة واحدة فقط)
+```bash
+cd backend
+python manage.py create_superuser
+```
+أدخل اسم المستخدم وكلمة المرور الجديدة
+هذا الحساب سيكون له صلاحيات المشرف الأعلى
+
+### 2. تشغيل النظام محلياً
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+source venv/bin/activate  # Windows: venv\Scripts\activate
+python manage.py runserver
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+python -m http.server 8010
+```
+
+### 3. تسجيل الدخول
+- افتح المتصفح على `http://localhost:8010`
+- استخدم اسم المستخدم وكلمة المرور التي أنشأتها
+- سيتم تحديد نوع المستخدم تلقائياً بناءً على الصلاحيات
 
 ### للمدرسين
 - عرض الجدول الدراسي حسب المادة والمرحلة الخاصة بهم
@@ -33,162 +135,42 @@
 - عرض الإحصائيات الشاملة
 - عرض الملف الشخصي
 
-## كيفية الاستخدام
-
-### 1. بدء النظام
-افتح الملف `index.html` في المتصفح
-
-### 2. إنشاء المشرف الأعلى (مرة واحدة فقط)
-- شغل الأمر: `python manage.py create_superuser`
-- أدخل اسم المستخدم وكلمة المرور الجديدة
-- هذا الحساب سيكون له صلاحيات المشرف الأعلى
-
-### 3. تسجيل الدخول
-- استخدم اسم المستخدم وكلمة المرور التي أنشأتها
-- سيتم تحديد نوع المستخدم تلقائياً بناءً على الصلاحيات
-
-### 3. إضافة مدرسين
-- من لوحة تحكم الأدمن، اختر "إدارة المدرسين"
-- اضغط على "إضافة مدرس جديد"
-- أدخل بيانات المدرس بما في ذلك **المادة** و **المرحلة** و **الشعبة**
-- سيتم إنشاء حساب تلقائياً
-
-### 4. إضافة موظفين
-- من لوحة تحكم الأدمن، اختر "إدارة الموظفين"
-- اختر نوع الموظف (إداري، أمني، خدمة)
-- أدخل بيانات الموظف (الاسم، القسم، المسمى الوظيفي، إلخ)
-- سيتم إنشاء حساب تلقائياً
-
-### 5. إضافة طلاب
-- من لوحة تحكم الأدمن، اختر "إدارة الطلاب"
-- اضغط على "إضافة طالب جديد"
-- أدخل بيانات الطالب بما في ذلك **المادة** و **المرحلة** و **الشعبة**
-- سيتم إنشاء حساب تلقائياً
-
-### 6. تسجيل الوجه
-- بعد إضافة طالب أو مدرس، اضغط على زر "تسجيل الوجه"
-- امنح صلاحية الكاميرا للمتصفح
-- التقط 3-5 صور من زوايا مختلفة
-- اضغط على "حفظ بيانات الوجه"
-- النظام سيقوم بتخزين الصور للمقارنة المستقبلية
-
-### 6. إنشاء الجدول الدراسي
-- من لوحة تحكم الأدمن، اختر "الجدول الدراسي"
-- اضغط على "إضافة محاضرة"
-- حدد اليوم، الوقت، **المادة**، **المرحلة**، المدرس، والقسم
-- الجدول سيربط المدرس بالطلاب حسب المادة والمرحلة
-
-### 7. تسجيل الحضور (للمدرسين)
-- سجل الدخول ك مدرس
-- اختر "تسجيل الحضور"
-- حدد المحاضرة من القائمة (سيظهر فقط محاضرات مادتك ومرحلتك)
-- **الخطوة 1**: سجل حضورك أولاً عبر الكاميرا (سيقوم النظام بمقارنة وجهك مع البيانات المسجلة)
-- **الخطوة 2**: سجل حضور الطلاب واحداً تلو الآخر (سيقوم النظام بالتعرف على كل طالب ومقارنة وجهه)
-- **الخطوة 3**: في النهاية، أكد نهاية المحاضرة بالتصوير
-
-### 8. عرض الحضور (للطلاب)
-- سجل الدخول ك طالب
-- اختر "سجل الحضور" لعرض سجلك
-- اختر "الإحصائيات" لعرض نسبة حضورك
-- الجدول الدراسي سيظهر فقط محاضرات مادتك ومرحلتك
-
-### 9. تقرير الحضور والغياب
-- من أي لوحة تحكم، اضغط على "تقرير الحضور والغياب"
-- اختر نوع التقرير (طلاب أو مدرسين)
-- استخدم الفلاتر للبحث حسب:
-  - المادة
-  - المرحلة
-  - الشعبة
-  - نطاق التاريخ
-  - الحالة (حاضر/غائب)
-  - البحث بالاسم
-- عرض الإحصائيات التلخيصية
-- تصدير التقرير إلى CSV
-- طباعة التقرير
-
-### 10. تسجيل حضور الموظفين
-- سجل الدخول ك موظف (إداري، أمني، خدمة)
-- اختر "تسجيل الحضور"
-- الوقود أمام الكاميرا
-- سيقوم النظام بالتعرف على وجهك وتسجيل الحضور
-- لا يمكن تسجيل الحضور أكثر من مرة في اليوم
-
-## هيكل الملفات
-
-```
-MUQ/
-├── index.html                 # الصفحة الرئيسية
-├── HTML/
-│   ├── login.html            # صفحة تسجيل الدخول
-│   ├── admin-dashboard.html  # لوحة تحكم الأدمن
-│   ├── teacher-dashboard.html # لوحة تحكم المدرس
-│   ├── student-dashboard.html # لوحة تحكم الطالب
-│   ├── staff-dashboard.html  # لوحة تحكم الموظفين
-│   ├── face-registration.html # صفحة تسجيل الوجه
-│   ├── staff-face-registration.html # صفحة تسجيل وجه الموظف
-│   └── attendance-report.html # تقرير الحضور والغياب
-├── css/
-│   └── style.css             # ملف التنسيقات
-├── Js/
-│   ├── database.js           # نظام قاعدة البيانات
-│   ├── face-recognition.js   # نظام التعرف على الوجوه
-│   ├── login.js              # منطق تسجيل الدخول
-│   ├── admin-dashboard.js    # منطق لوحة الأدمن
-│   ├── teacher-dashboard.js  # منطق لوحة المدرس
-│   ├── student-dashboard.js  # منطق لوحة الطالب
-│   ├── staff-dashboard.js    # منطق لوحة الموظفين
-│   ├── face-registration.js  # منطق تسجيل الوجه
-│   ├── staff-face-registration.js # منطق تسجيل وجه الموظف
-│   └── attendance-report.js  # منطق تقرير الحضور
-└── README.md                 # هذا الملف
-```
-
 ## التقنيات المستخدمة
 
+### Backend
+- Django 5.1.1
+- Django REST Framework 3.15.2
+- Django REST Framework SimpleJWT 5.3.1
+- PostgreSQL
+- Gunicorn
+- Whitenoise
+
+### Frontend
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
-- LocalStorage (لتخزين البيانات)
-- WebRTC (للوصول للكاميرا)
-- Face Recognition Algorithm (خوارزمية مقارنة الوجوه)
+- WebRTC (Camera access)
+- face-api.js (Face recognition)
+- JWT Authentication
 
-## كيف يعمل نظام التعرف على الوجوه
+## المميزات الأمنية
 
-1. **تسجيل الوجه**: عند تسجيل وجه طالب أو مدرس، يتم التقاط 3-5 صور من زوايا مختلفة
-2. **استخراج المميزات**: يتم تحويل كل صورة إلى بيانات رقمية (pixels) واستخراج المميزات
-3. **المقارنة**: عند تسجيل الحضور، يتم التقاط صورة ومقارنتها مع جميع الوجوه المسجلة
-4. **التطابق**: يتم حساب نسبة التشابه، وإذا كانت فوق 85% يُعتبر تطابق صحيح
-5. **التحقق**: للمدرسين، يتم التحقق من هويتهم قبل البدء بالحضور
-
-## ملاحظات مهمة
-
-1. **التعرف على الوجه**: النظام يستخدم خوارزمية مقارنة بسيطة. للتطبيق الحقيقي، يُنصح باستخدام مكتبات متقدمة مثل face-api.js للدقة الأعلى
-
-2. **تخزين البيانات**: البيانات تُخزن محلياً في المتصفح عبر LocalStorage. للتطبيق الحقيقي، يُنصح باستخدام قاعدة بيانات خادم
-
-3. **الأمان**: كلمات المرور تُخزن بشكل نصي. للتطبيق الحقيقي، يجب استخدام تشفير
-
-4. **الكاميرا**: يجب منح صلاحية الوصول للكاميرا في المتصفح
-
-5. **المادة والمرحلة**: النظام يربط الطلاب والمدرسين حسب المادة والمرحلة المحددة عند التسجيل
-
-## متطلبات التشغيل
-
-- متصفح حديث يدعم HTML5 و WebRTC
-- صلاحية الوصول للكاميرا
-- اتصال بالإنترنت (اختياري)
-
-## التطوير المستقبلي
-
-- تحسين دقة التعرف على الوجه باستخدام face-api.js
-- ربط بقاعدة بيانات خادم (SQL/NoSQL)
-- إضافة نظام إشعارات فورية
-- تحسين واجهة المستخدم وتجربة المستخدم
-- إضافة دعم للغات متعددة
-- إضافة تقارير PDF والطباعة
-- إضافة نظام تحليل البيانات المتقدم
-- دعم المزيد من الكاميرات لغرف دراسية كبيرة
+- JWT authentication مع token refresh
+- Token blacklisting عند تسجيل الخروج
+- تشفير كلمات المرور
+- CORS configuration
+- Session security
+- HSTS و SSL redirect في الإنتاج
 
 ## الدعم
 
+- [Backend Documentation](backend/README.md)
+- [Frontend Documentation](frontend/README.md)
+- [Deployment Guide](backend/DEPLOYMENT.md)
+- [Initial Audit Report](AUDIT_PHASE1.md)
+
 لأي استفسارات أو مشاكل، يرجى التواصل مع فريق الدعم الفني.
+
+## License
+
+Proprietary - MUQ System

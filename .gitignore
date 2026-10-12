@@ -1,10 +1,19 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.venv/
-venv/
-env/
+# Backend (Python/Django)
+backend/__pycache__/
+backend/*.py[cod]
+backend/*.egg-info/
+backend/.venv/
+backend/venv/
+backend/env/
+backend/*.sqlite3
+backend/*.db
+backend/media/uploads/
+backend/staticfiles/
+backend/.env
+
+# Frontend
+frontend/.DS_Store
+frontend/Thumbs.db
 
 # Secrets / local config
 .env
@@ -15,18 +24,17 @@ env/
 # Node
 node_modules/
 
-# Databases & media artifacts
-*.sqlite3
-*.db
-media/uploads/
-
-# Backups & archives
-_backups/
-backups/
-*.zip
-
 # OS / editor
 Thumbs.db
 Desktop.ini
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Backups (optional - uncomment to exclude from git)
+# _backups/

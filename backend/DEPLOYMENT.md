@@ -7,9 +7,9 @@
 
 ## Step 1: Prepare the Project
 
-1. **Navigate to the Django directory:**
+1. **Navigate to the backend directory:**
    ```bash
-   cd Django
+   cd backend
    ```
 
 2. **Ensure all dependencies are installed:**

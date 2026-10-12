@@ -1,7 +1,8 @@
 // API Client for Django REST Framework
+// Configure this based on your backend URL
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:8000/api'
-    : '/api';
+    : 'https://your-backend-url.railway.app/api';
 
 class APIClient {
     constructor() {
