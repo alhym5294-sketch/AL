@@ -1,6 +1,4 @@
-// Import database class
-// The database is defined in database.js and will be available when loaded
-
+// Login with API Client
 const HOME_BY_TYPE = {
     admin: 'admin-dashboard.html',
     teacher: 'teacher-dashboard.html',
@@ -22,7 +20,7 @@ function getQueryParam(name) {
 }
 
 function canOpenPortal(user, portalKey) {
-    return user.type === portalKey || user.type === 'admin';
+    return user.user_type === portalKey || user.user_type === 'admin';
 }
 
 function showError(message) {
@@ -37,31 +35,47 @@ if (requestedPortalKey) {
 }
 
 // Login form handler
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const userType = document.getElementById('userType').value;
 
-    const user = db.authenticateUser(username, password, userType);
+    showError('جاري تسجيل الدخول...');
 
-    if (!user) {
-        showError('اسم المستخدم أو كلمة المرور غير صحيحة');
-        return;
+    try {
+        const result = await api.login(username, password);
+
+        if (!result.success) {
+            showError(result.error || 'اسم المستخدم أو كلمة المرور غير صحيحة');
+            return;
+        }
+
+        const user = result.user;
+
+        // Verify user type matches selection
+        if (user.user_type !== userType && userType !== 'admin') {
+            await api.logout();
+            showError('نوع المستخدم غير مطابق');
+            return;
+        }
+
+        if (requestedPortalKey && !canOpenPortal(user, requestedPortalKey)) {
+            await api.logout();
+            showError(`هذا الحساب غير مخوّل بفتح ${PORTALS[requestedPortalKey].label}.`);
+            return;
+        }
+
+        window.location.href = requestedPortalKey ? PORTALS[requestedPortalKey].page : HOME_BY_TYPE[userType];
+    } catch (error) {
+        console.error('Login error:', error);
+        showError('حدث خطأ أثناء تسجيل الدخول. تأكد من تشغيل السيرفر.');
     }
-
-    if (requestedPortalKey && !canOpenPortal(user, requestedPortalKey)) {
-        showError(`هذا الحساب غير مخوّل بفتح ${PORTALS[requestedPortalKey].label}.`);
-        return;
-    }
-
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    window.location.href = requestedPortalKey ? PORTALS[requestedPortalKey].page : HOME_BY_TYPE[userType];
 });
 
 // Check if user is already logged in
-window.addEventListener('load', function() {
+window.addEventListener('load', async function() {
     const deniedParam = getQueryParam('denied');
 
     if (PORTALS[deniedParam]) {
@@ -69,27 +83,30 @@ window.addEventListener('load', function() {
         return;
     }
 
-    const raw = localStorage.getItem('currentUser');
-    if (!raw) return;
-
-    let user;
-    try {
-        user = JSON.parse(raw);
-    } catch (err) {
-        localStorage.removeItem('currentUser');
-        return;
-    }
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) return;
 
     if (requestedPortalKey) {
-        if (canOpenPortal(user, requestedPortalKey)) {
-            window.location.href = PORTALS[requestedPortalKey].page;
-        } else {
-            showError(`حسابك الحالي غير مخوّل بفتح ${PORTALS[requestedPortalKey].label}. سجّل الدخول بحساب آخر.`);
+        try {
+            const user = await api.getCurrentUser();
+            if (user && canOpenPortal(user, requestedPortalKey)) {
+                window.location.href = PORTALS[requestedPortalKey].page;
+            } else {
+                await api.logout();
+                showError(`حسابك الحالي غير مخوّل بفتح ${PORTALS[requestedPortalKey].label}. سجّل الدخول بحساب آخر.`);
+            }
+        } catch (error) {
+            await api.logout();
         }
         return;
     }
 
-    if (HOME_BY_TYPE[user.type]) {
-        window.location.href = HOME_BY_TYPE[user.type];
+    try {
+        const user = await api.getCurrentUser();
+        if (user && HOME_BY_TYPE[user.user_type]) {
+            window.location.href = HOME_BY_TYPE[user.user_type];
+        }
+    } catch (error) {
+        await api.logout();
     }
 });

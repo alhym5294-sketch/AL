@@ -36,14 +36,40 @@ MUQ/
 
 ## 🚀 البدء السريع
 
-### Backend (Django)
+### الطريقة السهلة (Windows)
+
+1. **إعداد البيئة (مرة واحدة فقط):**
+```bash
+setup-env.bat
+```
+
+2. **إنشاء مستخدم المشرف (مرة واحدة فقط):**
+```bash
+cd backend
+venv\Scripts\activate
+python manage.py create_superuser
+```
+
+3. **تشغيل النظام:**
+- Terminal 1: `start.bat` (تشغيل Backend)
+- Terminal 2: `start-frontend.bat` (تشغيل Frontend)
+
+4. **فتح المتصفح:**
+- افتح `http://localhost:8010` في المتصفح
+- سجل الدخول بالمستخدم الذي أنشأته
+
+### الطريقة اليدوية
+
+#### Backend (Django)
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
-cp .env.example .env
+copy .env.example .env  # Windows
+# cp .env.example .env  # Linux/Mac
 python manage.py migrate
 python manage.py create_superuser
 python manage.py runserver
@@ -51,16 +77,18 @@ python manage.py runserver
 
 Backend سيكون متاح على `http://localhost:8000/api/`
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
-# Option 1: Open index.html directly in browser
-# Option 2: Use a local server
 python -m http.server 8010
 ```
 
 Frontend سيكون متاح على `http://localhost:8010`
+
+## 📖 دليل الاستخدام الشامل
+
+راجع ملف [SETUP.md](SETUP.md) للحصول على دليل مفصل لجميع ميزات النظام.
 
 ## 🌐 النشر
 
