@@ -1,9 +1,9 @@
 from django.contrib.auth import authenticate
 from rest_framework import status, viewsets
-from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import FaceProfile, User
 from .permissions import IsSelfOrCreate, IsSuperAdmin
@@ -52,7 +52,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         user.is_active = False
         user.save(update_fields=['is_active', 'updated_at'])
-        Token.objects.filter(user=user).delete()
         return Response({'status': 'deactivated', 'id': user.pk})
 
     @action(detail=True, methods=['post'], permission_classes=[IsSuperAdmin])
@@ -71,8 +70,6 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
         user.set_password(new_password)
         user.save(update_fields=['password'])
-        # Force re-authentication with the new credential.
-        Token.objects.filter(user=user).delete()
         return Response({'status': 'password_reset', 'id': user.pk})
 
 
@@ -110,7 +107,7 @@ class FaceProfileViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    """Token login. Replaces the plaintext localStorage check in Js/login.js."""
+    """JWT login. Replaces the plaintext localStorage check in Js/login.js."""
     username = (request.data.get('username') or '').strip()
     password = request.data.get('password') or ''
 
@@ -125,10 +122,11 @@ def login_view(request):
         return Response({'error': 'بيانات الدخول غير صحيحة.'},
                         status=status.HTTP_401_UNAUTHORIZED)
 
-    token, _ = Token.objects.get_or_create(user=user)
+    refresh = RefreshToken.for_user(user)
     return Response({
         'success': True,
-        'token': token.key,
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
         'user': UserSerializer(user).data,
     })
 
@@ -136,7 +134,13 @@ def login_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    Token.objects.filter(user=request.user).delete()
+    try:
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+    except Exception:
+        pass
     return Response({'success': True})
 
 

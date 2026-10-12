@@ -1,167 +1,182 @@
-# نظام MUQ - Django Backend
+# MUQ System - Django REST Framework Backend
 
-هذا هو الـ Backend لنظام MUQ باستخدام Django و Django REST Framework.
+## Overview
+This is the Django REST Framework backend for the MUQ attendance system with face recognition. It provides a secure API with JWT authentication and PostgreSQL database support.
 
-## 📋 المتطلبات
+## Features
+- JWT-based authentication with token refresh
+- Role-based access control (Admin, Teacher, Student, Staff)
+- Face profile management with versioning
+- Attendance tracking and reporting
+- Schedule management
+- Department, Stage, and Branch hierarchy
+- CORS support for frontend integration
+- PostgreSQL production database
 
+## Tech Stack
+- Django 5.1.1
+- Django REST Framework 3.15.2
+- Django REST Framework SimpleJWT 5.3.1
+- PostgreSQL
+- Gunicorn (production server)
+- Whitenoise (static file serving)
+
+## Local Development
+
+### Prerequisites
 - Python 3.8+
-- PostgreSQL 12+
-- pip
+- PostgreSQL (optional, defaults to SQLite for local dev)
 
-## 🚀 التثبيت
+### Setup
 
-### 1. إنشاء البيئة الافتراضية
+1. **Create virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-```bash
-cd Django
-python -m venv venv
-```
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 2. تفعيل البيئة الافتراضية
+3. **Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings
+   ```
 
-**Windows:**
-```bash
-venv\Scripts\activate
-```
+4. **Run migrations:**
+   ```bash
+   python manage.py migrate
+   ```
 
-**Linux/Mac:**
-```bash
-source venv/bin/activate
-```
+5. **Create superuser:**
+   ```bash
+   python manage.py create_superuser
+   ```
 
-### 3. تثبيت الحزم
+6. **Run development server:**
+   ```bash
+   python manage.py runserver
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+The API will be available at `http://localhost:8000/api/`
 
-### 4. إعداد قاعدة البيانات
+## API Endpoints
 
-**إنشاء قاعدة بيانات PostgreSQL:**
-```sql
-CREATE DATABASE muq_system;
-```
+### Authentication
+- `POST /api/auth/login/` - Login and get JWT tokens
+- `POST /api/auth/logout/` - Logout (blacklist refresh token)
+- `GET /api/auth/me/` - Get current user info
+- `POST /api/auth/token/refresh/` - Refresh access token
 
-**تعديل إعدادات قاعدة البيانات في `muq_system/settings.py`:**
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'muq_system',
-        'USER': 'postgres',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+### Users
+- `GET /api/users/` - List users (admin only)
+- `POST /api/users/` - Create user (admin only)
+- `GET /api/users/{id}/` - Get user details
+- `PATCH /api/users/{id}/` - Update user
+- `DELETE /api/users/{id}/` - Delete user (admin only)
+- `POST /api/users/{id}/deactivate/` - Deactivate user (admin only)
+- `POST /api/users/{id}/reactivate/` - Reactivate user (admin only)
+- `POST /api/users/{id}/reset_password/` - Reset password (admin only)
 
-### 5. تشغيل الترحيلات
+### Departments
+- `GET /api/departments/` - List departments
+- `POST /api/departments/` - Create department
+- `GET /api/departments/{id}/` - Get department details
+- `PATCH /api/departments/{id}/` - Update department
+- `DELETE /api/departments/{id}/` - Delete department
 
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
+### Stages
+- `GET /api/stages/` - List stages
+- `POST /api/stages/` - Create stage
+- `GET /api/stages/{id}/` - Get stage details
+- `PATCH /api/stages/{id}/` - Update stage
+- `DELETE /api/stages/{id}/` - Delete stage
 
-### 6. إنشاء مستخدم الأدمن
+### Branches
+- `GET /api/branches/` - List branches
+- `POST /api/branches/` - Create branch
+- `GET /api/branches/{id}/` - Get branch details
+- `PATCH /api/branches/{id}/` - Update branch
+- `DELETE /api/branches/{id}/` - Delete branch
 
-```bash
-python manage.py createsuperuser
-```
+### Attendance
+- `GET /api/attendance/` - List attendance records
+- `POST /api/attendance/` - Create attendance record
+- `GET /api/attendance/{id}/` - Get attendance details
+- `PATCH /api/attendance/{id}/` - Update attendance
+- `DELETE /api/attendance/{id}/` - Delete attendance
 
-### 7. تشغيل الخادم
+### Schedule
+- `GET /api/schedule/` - List schedule items
+- `POST /api/schedule/` - Create schedule item
+- `GET /api/schedule/{id}/` - Get schedule details
+- `PATCH /api/schedule/{id}/` - Update schedule
+- `DELETE /api/schedule/{id}/` - Delete schedule
 
-```bash
-python manage.py runserver
-```
+### Face Profiles
+- `GET /api/face-profiles/` - List face profiles
+- `POST /api/face-profiles/` - Create face profile (admin only)
+- `GET /api/face-profiles/{id}/` - Get face profile details
+- `PATCH /api/face-profiles/{id}/` - Update face profile (admin only)
+- `DELETE /api/face-profiles/{id}/` - Delete face profile (admin only)
 
-الخادم سيعمل على: `http://localhost:8000`
+### Health Check
+- `GET /api/health/` - Health check endpoint
 
-## 📊 APIs المتاحة
+## Environment Variables
 
-### الأقسام
-- `GET /departments/api/departments/` - عرض جميع الأقسام
-- `POST /departments/api/departments/` - إضافة قسم جديد
-- `GET /departments/api/departments/{id}/` - عرض قسم محدد
-- `PUT /departments/api/departments/{id}/` - تحديث قسم
-- `DELETE /departments/api/departments/{id}/` - حذف قسم
+See `.env.example` for all available variables. Key variables:
 
-### المراحل
-- `GET /departments/api/stages/` - عرض جميع المراحل
-- `POST /departments/api/stages/` - إضافة مرحلة جديدة
-- `GET /departments/api/stages/{id}/` - عرض مرحلة محددة
-- `PUT /departments/api/stages/{id}/` - تحديث مرحلة
-- `DELETE /departments/api/stages/{id}/` - حذف مرحلة
+- `DEBUG` - Set to `False` in production
+- `SECRET_KEY` - Django secret key (generate with `python manage.py generatesecretkey`)
+- `DB_ENGINE` - `sqlite` for local, `postgresql` for production
+- `CORS_ALLOWED_ORIGINS` - Frontend domains allowed to access API
+- `JWT_ACCESS_TOKEN_HOURS` - Access token lifetime
+- `JWT_REFRESH_TOKEN_DAYS` - Refresh token lifetime
 
-### الشعب
-- `GET /departments/api/branches/` - عرض جميع الشعب
-- `POST /departments/api/branches/` - إضافة شعبة جديدة
-- `GET /departments/api/branches/{id}/` - عرض شعبة محددة
-- `PUT /departments/api/branches/{id}/` - تحديث شعبة
-- `DELETE /departments/api/branches/{id}/` - حذف شعبة
+## Security Features
 
-### المستخدمين
-- `GET /users/api/users/` - عرض جميع المستخدمين
-- `POST /users/api/users/` - إضافة مستخدم جديد
-- `GET /users/api/users/{id}/` - عرض مستخدم محدد
-- `PUT /users/api/users/{id}/` - تحديث مستخدم
-- `DELETE /users/api/users/{id}/` - حذف مستخدم
+- JWT authentication with automatic token refresh
+- Token blacklisting on logout
+- Password hashing with Django's default validators
+- CORS configuration
+- Session security settings
+- HSTS and SSL redirect in production
 
-### ملفات الوجه
-- `GET /users/api/face-profiles/` - عرض جميع ملفات الوجه
-- `POST /users/api/face-profiles/` - إضافة ملف وجه جديد
-- `GET /users/api/face-profiles/{id}/` - عرض ملف وجه محدد
-- `PUT /users/api/face-profiles/{id}/` - تحديث ملف وجه
-- `DELETE /users/api/face-profiles/{id}/` - حذف ملف وجه
+## Deployment
 
-### الحضور
-- `GET /attendance/api/attendance/` - عرض جميع سجلات الحضور
-- `POST /attendance/api/attendance/` - تسجيل حضور جديد
-- `GET /attendance/api/attendance/{id}/` - عرض سجل حضور محدد
-- `PUT /attendance/api/attendance/{id}/` - تحديث سجل حضور
-- `DELETE /attendance/api/attendance/{id}/` - حذف سجل حضور
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed Railway deployment instructions.
 
-### الجدول الدراسي
-- `GET /attendance/api/schedule/` - عرض الجدول الدراسي
-- `POST /attendance/api/schedule/` - إضافة محاضرة جديدة
-- `GET /attendance/api/schedule/{id}/` - عرض محاضرة محددة
-- `PUT /attendance/api/schedule/{id}/` - تحديث محاضرة
-- `DELETE /attendance/api/schedule/{id}/` - حذف محاضرة
-
-## 🔐 لوحة الإدارة
-
-يمكنك الوصول إلى لوحة إدارة Django على:
-`http://localhost:8000/admin`
-
-## 📦 هيكل المشروع
+## Project Structure
 
 ```
 Django/
-├── departments/          # تطبيق الأقسام والمراحل والشعب
-├── users/               # تطبيق المستخدمين وملفات الوجه
-├── attendance/          # تطبيق الحضور والجدول الدراسي
-├── muq_system/         # إعدادات المشروع الرئيسية
-├── venv/               # البيئة الافتراضية
-├── requirements.txt    # الحزم المطلوبة
-└── .env.example       # نموذج ملف البيئة
+├── attendance/          # Attendance and schedule models/views
+├── departments/         # Department, Stage, Branch models/views
+├── users/              # User and FaceProfile models/views
+├── muq_system/         # Django project settings
+├── manage.py           # Django management script
+├── requirements.txt    # Python dependencies
+├── Procfile           # Railway deployment config
+├── railway.json       # Railway project config
+├── .env.example       # Environment variables template
+└── DEPLOYMENT.md      # Deployment guide
 ```
 
-## ⚙️ الإعدادات
+## Testing
 
-### CORS
-تم تفعيل CORS للسماح بالاتصال من الواجهة الأمامية.
-
-### قاعدة البيانات
-يستخدم Django MySQL كقاعدة بيانات رئيسية.
-
-## 🧪 الاختبار
-
+Run tests with:
 ```bash
 python manage.py test
 ```
 
-## 📝 ملاحظات
+## Admin Panel
 
-- تأكد من تشغيل MySQL قبل تشغيل الخادم
-- تأكد من إنشاء قاعدة البيانات قبل تشغيل الترحيلات
-- يمكنك تغيير المنفذ (port) باستخدام: `python manage.py runserver 8080`
+Access Django admin at `/admin/` with your superuser credentials.
+
+## License
+
+Proprietary - MUQ System

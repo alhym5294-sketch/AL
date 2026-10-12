@@ -126,11 +126,7 @@ class Database {
         localStorage.setItem('muq_users', JSON.stringify(filtered));
     }
 
-    async getStudents() {
-        if (this.useMySQL) {
-            const result = await dbAPI.getStudents();
-            return result || [];
-        }
+    getStudents() {
         return JSON.parse(localStorage.getItem('muq_students')) || [];
     }
 
