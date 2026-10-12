@@ -1,11 +1,12 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
+
 from .views import AttendanceViewSet, ScheduleViewSet
 
-router = DefaultRouter()
-router.register(r'attendance', AttendanceViewSet)
-router.register(r'schedule', ScheduleViewSet)
+router = SimpleRouter()
+router.register(r'attendance', AttendanceViewSet, basename='attendance')
+router.register(r'schedule', ScheduleViewSet, basename='schedule')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]

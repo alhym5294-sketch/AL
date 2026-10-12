@@ -1,12 +1,13 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import DepartmentViewSet, StageViewSet, BranchViewSet
+from django.urls import include, path
+from rest_framework.routers import SimpleRouter
 
-router = DefaultRouter()
-router.register(r'departments', DepartmentViewSet)
-router.register(r'stages', StageViewSet)
-router.register(r'branches', BranchViewSet)
+from .views import BranchViewSet, DepartmentViewSet, StageViewSet
+
+router = SimpleRouter()
+router.register(r'departments', DepartmentViewSet, basename='department')
+router.register(r'stages', StageViewSet, basename='stage')
+router.register(r'branches', BranchViewSet, basename='branch')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]
